@@ -919,10 +919,12 @@ body {
         justify-content: center;
         gap: 0.5rem;
     }
+
     .hero-name-row .nav-pill {
         margin-left: 0;
         order: 2;
     }
+
     .hero-name {
         order: 1;
         text-align: center;
