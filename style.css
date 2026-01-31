@@ -997,3 +997,26 @@ body {
     text-align: center;
     font-size: 0.95rem;
 }
+/* New styles for profile badges */
+.contact-link-badge {
+    display: inline-flex;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0.9;
+}
+
+.contact-link-badge:hover {
+    transform: translateY(-4px);
+    opacity: 1;
+}
+
+/* Enhancements for Speaking section headers */
+.speaking h3 {
+    color: var(--accent);
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+}
+
+.speaking h3:first-of-type {
+    margin-top: 0;
+}
