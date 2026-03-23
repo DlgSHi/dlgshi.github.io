@@ -9,141 +9,18 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Mobile / hamburger nav (now hamburger-only)
+// Theme + years init
 document.addEventListener('DOMContentLoaded', () => {
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    const toggleEl = document.querySelector('.toggle');
-    let previousActive = null;
-    let focusableElements = [];
-    let trapListener = null;
-    if (!hamburger || !navLinks) return;
-
-    // Defensive: remove any accidental empty direct child nodes inside the nav
-    // (fixes stray empty-pill artifacts that may be injected or left behind).
-    try {
-        const nav = document.querySelector('.nav');
-        if (nav) {
-            Array.from(nav.children).forEach(ch => {
-                const isEmpty = (ch.textContent || '').trim() === '' && ch.children.length === 0;
-                if (isEmpty) ch.remove();
-            });
-        }
-    } catch (e) { /* no-op */ }
-
-    hamburger.setAttribute('aria-expanded', 'false');
-    hamburger.setAttribute('aria-label', 'Open navigation');
-
-    function createBackdrop() {
-        let backdrop = document.querySelector('.nav-backdrop');
-        if (!backdrop) {
-            backdrop = document.createElement('div');
-            backdrop.className = 'nav-backdrop';
-            document.body.appendChild(backdrop);
-            backdrop.addEventListener('click', closeNav);
-        }
-        return backdrop;
+    // Apply saved/preferred theme on load
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        root.setAttribute('data-theme', 'dark');
+    } else if (!savedTheme) {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) root.setAttribute('data-theme', 'dark');
     }
 
-    function openNav() {
-        const backdrop = createBackdrop();
-        requestAnimationFrame(() => backdrop.classList.add('visible'));
-        navLinks.classList.add('active');
-        navLinks.setAttribute('aria-hidden', 'false');
-        hamburger.setAttribute('aria-expanded', 'true');
-        document.body.style.overflow = 'hidden';
-        // Save previously focused element to restore on close
-        previousActive = document.activeElement;
-        // Collect focusable elements inside the nav
-        focusableElements = Array.from(navLinks.querySelectorAll('a[href], button, [role="button"], [tabindex]:not([tabindex="-1"])'))
-            .filter(el => !el.hasAttribute('disabled'));
-        // Focus first focusable element
-        if (focusableElements.length) focusableElements[0].focus();
-        // Add keydown trap to keep focus inside the drawer
-        trapListener = function (e) {
-            if (e.key !== 'Tab') return;
-            const first = focusableElements[0];
-            const last = focusableElements[focusableElements.length - 1];
-            if (!first || !last) return;
-            if (e.shiftKey) {
-                if (document.activeElement === first) {
-                    e.preventDefault();
-                    last.focus();
-                }
-            } else {
-                if (document.activeElement === last) {
-                    e.preventDefault();
-                    first.focus();
-                }
-            }
-        };
-        document.addEventListener('keydown', trapListener);
-    }
-
-    function closeNav() {
-        const backdrop = document.querySelector('.nav-backdrop');
-        if (backdrop) backdrop.classList.remove('visible');
-        navLinks.classList.remove('active');
-        navLinks.setAttribute('aria-hidden', 'true');
-        hamburger.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-        // Remove keydown trap
-        if (trapListener) {
-            document.removeEventListener('keydown', trapListener);
-            trapListener = null;
-        }
-        // Restore focus to the previously active element (usually the hamburger)
-        if (previousActive && typeof previousActive.focus === 'function') previousActive.focus();
-        setTimeout(() => {
-            const b = document.querySelector('.nav-backdrop');
-            if (b) b.remove();
-        }, 260);
-    }
-
-    hamburger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (navLinks.classList.contains('active')) closeNav(); else openNav();
-    });
-
-    // Close nav when clicking a link
-    navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => closeNav()));
-
-    // Close on Escape
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeNav(); });
-
-    // Theme toggle initialization (safe guard)
-    if (toggleEl) {
-        const root = document.documentElement;
-        function setTheme(mode) {
-            const sun = document.querySelector('.theme-toggle .sun');
-            const moon = document.querySelector('.theme-toggle .moon');
-            if (mode === 'dark') {
-                root.setAttribute('data-theme', 'dark');
-            } else {
-                root.removeAttribute('data-theme');
-            }
-            // persist as either 'dark' or empty string for light/default
-            localStorage.setItem('theme', mode === 'dark' ? 'dark' : '');
-            toggleEl.setAttribute('aria-checked', mode === 'dark' ? 'true' : 'false');
-            if (sun) sun.setAttribute('aria-hidden', mode === 'dark' ? 'true' : 'false');
-            if (moon) moon.setAttribute('aria-hidden', mode === 'dark' ? 'false' : 'true');
-        }
-
-        toggleEl.addEventListener('click', () => {
-            const current = root.getAttribute('data-theme') === 'dark' ? 'dark' : '';
-            setTheme(current === 'dark' ? '' : 'dark');
-        });
-        // keyboard support
-        toggleEl.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleEl.click(); } });
-
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            setTheme('dark');
-        } else {
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            setTheme(prefersDark ? 'dark' : '');
-        }
-    }
     // Calculate and update years of experience displayed on the page
     try {
         const startMonth = 8; // August
@@ -158,6 +35,168 @@ document.addEventListener('DOMContentLoaded', () => {
         if (el2) el2.textContent = display;
     } catch (e) { console.error('years calc', e); }
 });
+
+// ── Dock Magnification Effect ──
+(function initDock() {
+    const MAGNIFICATION = 80;
+    const DISTANCE = 150;
+    const BASE_SIZE = 40;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const dock = document.getElementById('dock');
+        if (!dock) return;
+
+        const items = dock.querySelectorAll('.dock-item');
+
+        dock.addEventListener('mousemove', (e) => {
+            items.forEach(item => {
+                const rect = item.getBoundingClientRect();
+                const itemCenterX = rect.x + rect.width / 2;
+                const dist = Math.abs(e.clientX - itemCenterX);
+
+                const scale = Math.max(
+                    BASE_SIZE,
+                    MAGNIFICATION - (MAGNIFICATION - BASE_SIZE) * (dist / DISTANCE)
+                );
+                const size = Math.min(scale, MAGNIFICATION);
+
+                item.style.width = size + 'px';
+                item.style.height = size + 'px';
+            });
+        });
+
+        dock.addEventListener('mouseleave', () => {
+            items.forEach(item => {
+                item.style.width = BASE_SIZE + 'px';
+                item.style.height = BASE_SIZE + 'px';
+            });
+        });
+
+        // Dock theme toggle
+        const dockThemeToggle = dock.querySelector('.dock-theme-toggle');
+        if (dockThemeToggle) {
+            dockThemeToggle.addEventListener('click', () => {
+                const root = document.documentElement;
+                const isDark = root.getAttribute('data-theme') === 'dark';
+                const newTheme = isDark ? '' : 'dark';
+
+                if (newTheme === 'dark') {
+                    root.setAttribute('data-theme', 'dark');
+                } else {
+                    root.removeAttribute('data-theme');
+                }
+                localStorage.setItem('theme', newTheme);
+                updateDockThemeIcon();
+                // Also update the hero toggle if present
+                const toggleEl = document.querySelector('.toggle');
+                if (toggleEl) {
+                    toggleEl.setAttribute('aria-checked', newTheme === 'dark' ? 'true' : 'false');
+                }
+            });
+
+            dockThemeToggle.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    dockThemeToggle.click();
+                }
+            });
+        }
+
+        function updateDockThemeIcon() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const sun = dock.querySelector('.dock-sun');
+            const moon = dock.querySelector('.dock-moon');
+            if (sun && moon) {
+                sun.style.display = isDark ? 'none' : '';
+                moon.style.display = isDark ? '' : 'none';
+            }
+        }
+
+        // Initial state
+        updateDockThemeIcon();
+
+        // Observe theme changes from other toggles
+        const mo = new MutationObserver(() => updateDockThemeIcon());
+        mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+        // Smooth scroll for dock links
+        dock.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(anchor.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    });
+})();
+
+// ── Glowing Effect ──
+(function initGlowingEffect() {
+    const SPREAD = 40;
+    const PROXIMITY = 64;
+    const INACTIVE_ZONE = 0.01;
+
+    // Selectors for cards that should glow (inner cards only, not bento containers)
+    const CARD_SELECTORS = '.skill-group, .project-card, .exp-card';
+
+    function setupGlow() {
+        document.querySelectorAll(CARD_SELECTORS).forEach(card => {
+            if (card.querySelector('.glow-border')) return; // already set up
+            card.classList.add('glow-wrapper');
+            card.style.setProperty('--glow-spread', SPREAD);
+
+            const border = document.createElement('div');
+            border.className = 'glow-border';
+            card.appendChild(border);
+
+            const borderBlur = document.createElement('div');
+            borderBlur.className = 'glow-border-blur';
+            card.appendChild(borderBlur);
+        });
+    }
+
+    function handlePointerMove(e) {
+        document.querySelectorAll('.glow-wrapper').forEach(el => {
+            const { left, top, width, height } = el.getBoundingClientRect();
+            const centerX = left + width * 0.5;
+            const centerY = top + height * 0.5;
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            const distFromCenter = Math.hypot(mouseX - centerX, mouseY - centerY);
+            const inactiveRadius = 0.5 * Math.min(width, height) * INACTIVE_ZONE;
+
+            if (distFromCenter < inactiveRadius) {
+                el.style.setProperty('--glow-active', '0');
+                return;
+            }
+
+            const isActive =
+                mouseX > left - PROXIMITY &&
+                mouseX < left + width + PROXIMITY &&
+                mouseY > top - PROXIMITY &&
+                mouseY < top + height + PROXIMITY;
+
+            el.style.setProperty('--glow-active', isActive ? '1' : '0');
+
+            if (!isActive) return;
+
+            const angle = (180 * Math.atan2(mouseY - centerY, mouseX - centerX)) / Math.PI + 90;
+            el.style.setProperty('--glow-start', angle);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setupGlow();
+        document.body.addEventListener('pointermove', handlePointerMove, { passive: true });
+        window.addEventListener('scroll', () => {
+            // Re-evaluate on scroll since card positions change
+            document.querySelectorAll('.glow-wrapper').forEach(el => {
+                el.style.setProperty('--glow-active', '0');
+            });
+        }, { passive: true });
+    });
+})();
 
 // Scroll animations
 const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
