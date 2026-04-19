@@ -1,35 +1,35 @@
 :root {
     color-scheme: light;
-    --bg-primary: oklch(98% 0.02 260);
-    --bg-secondary: oklch(96% 0.03 260);
-    --surface: oklch(99% 0.015 260);
-    --surface-elevated: oklch(97% 0.02 260);
-    --text-primary: oklch(22% 0.03 260);
-    --text-secondary: oklch(44% 0.04 260);
-    --accent: oklch(62% 0.2 262);
-    --accent-hover: oklch(58% 0.22 262);
-    --accent-2: oklch(68% 0.18 210);
-    --border: oklch(90% 0.02 260);
-    --glow: 0 0 0 1px color-mix(in oklab, var(--accent) 15%, transparent), 0 12px 40px -18px color-mix(in oklab, var(--accent) 40%, transparent);
-    --shadow: 0 18px 40px -22px color-mix(in oklab, black 45%, transparent);
-    --shadow-lg: 0 30px 70px -28px color-mix(in oklab, black 55%, transparent);
+    --bg-primary: #fdf8f2;
+    --bg-secondary: #f5ede4;
+    --surface: #fff9f4;
+    --surface-elevated: #fffcf8;
+    --text-primary: #1a1410;
+    --text-secondary: #7a6e64;
+    --accent: #c86840;
+    --accent-hover: #da7756;
+    --accent-deep: #b05830;
+    --border: #e8ddd0;
+    --glow: 0 0 0 1px rgba(200, 104, 64, 0.12), 0 12px 40px -18px rgba(200, 104, 64, 0.25);
+    --shadow: 0 18px 40px -22px rgba(180, 120, 80, 0.18);
+    --shadow-lg: 0 30px 70px -28px rgba(180, 120, 80, 0.25);
 }
 
 [data-theme="dark"] {
     color-scheme: dark;
-    --bg-primary: oklch(16% 0.02 260);
-    --bg-secondary: oklch(20% 0.03 260);
-    --surface: oklch(18% 0.02 260);
-    --surface-elevated: oklch(22% 0.03 260);
-    --text-primary: oklch(96% 0.02 260);
-    --text-secondary: oklch(78% 0.03 260);
-    --accent: oklch(70% 0.19 262);
-    --accent-hover: oklch(74% 0.18 262);
-    --accent-2: oklch(76% 0.16 210);
-    --border: oklch(30% 0.02 260);
-    --glow: 0 0 0 1px color-mix(in oklab, var(--accent) 18%, transparent), 0 12px 40px -18px color-mix(in oklab, var(--accent) 50%, transparent);
-    --shadow: 0 20px 55px -28px color-mix(in oklab, black 75%, transparent);
-    --shadow-lg: 0 34px 90px -32px color-mix(in oklab, black 85%, transparent);
+    --bg-primary: #111009;
+    --bg-secondary: #16120e;
+    --surface: #1a1612;
+    --surface-elevated: #1e1a15;
+    --text-primary: #f5ede2;
+    --text-secondary: #9a8f82;
+    --accent: #da7756;
+    --accent-hover: #e8956e;
+    --accent-deep: #c86840;
+    --border: #2e2820;
+    --glow: 0 0 0 1px rgba(218, 119, 86, 0.15), 0 12px 40px -18px rgba(218, 119, 86, 0.4);
+    --shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.7);
+    --shadow-lg: 0 30px 70px -28px rgba(0, 0, 0, 0.85);
 }
 
 * {
@@ -39,12 +39,12 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Geist Mono', monospace;
     line-height: 1.6;
     color: var(--text-primary);
     background:
         radial-gradient(1000px 700px at 10% -10%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%),
-        radial-gradient(800px 600px at 90% -20%, color-mix(in oklab, var(--accent-2) 14%, transparent), transparent 55%),
+        radial-gradient(800px 600px at 90% -20%, color-mix(in oklab, var(--accent-deep) 14%, transparent), transparent 55%),
         var(--bg-primary);
     overflow-x: hidden;
 }
@@ -87,7 +87,7 @@ body {
     font-size: clamp(2.5rem, 5vw, 4rem);
     font-weight: 700;
     margin-bottom: 0.25rem;
-    background: linear-gradient(135deg, var(--accent), #3b82f6);
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -125,7 +125,7 @@ body {
     font-size: clamp(2.5rem, 5vw, 4rem);
     font-weight: 700;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, var(--accent), #3b82f6);
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -171,7 +171,7 @@ body {
 }
 
 .btn.primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
     color: white;
     box-shadow: var(--shadow);
 }
@@ -370,7 +370,7 @@ body {
 }
 
 .exp-date {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
     color: white;
     padding: 0.75rem 1.5rem;
     border-radius: 50px;
@@ -444,7 +444,7 @@ body {
 
 .project-links a {
     padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
     color: white;
     border-radius: 50px;
     font-size: 0.9rem;
@@ -474,7 +474,7 @@ body {
 
 .contact-link {
     padding: 1.25rem 2.5rem;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
     color: white;
     border-radius: 50px;
     font-weight: 600;
